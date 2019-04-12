@@ -28,6 +28,8 @@ import net.openid.appauth.internal.Logger;
 
 import org.json.JSONException;
 
+import java.util.Objects;
+
 /**
  * Stores state and handles events related to the authorization flow. The activity is
  * started by {@link AuthorizationService#performAuthorizationRequest
@@ -255,7 +257,7 @@ public class AuthorizationManagementActivity extends Activity {
     }
 
     private void handleAuthorizationComplete() {
-        Uri responseUri = getIntent().getData();
+        Uri responseUri = Uri.parse(Objects.requireNonNull(getIntent().getData()).toString().replace('#', '?'));
         Intent responseData = extractResponseData(responseUri);
         if (responseData == null) {
             Logger.error("Failed to extract OAuth2 response from redirect");
