@@ -50,10 +50,24 @@ public final class BrowserSelector {
 
     /**
      * The service we expect to find on a web browser that indicates it supports custom tabs.
+     *
+     * Workaround for Android Jetifier bug (https://issuetracker.google.com/issues/119183822)
+     *
+     * Problem: Projects that are using androidx are using a Jetifier compiler as a dependency.
+     * The Jetifier compiler is replacing "android.support" with "androidx" inside all the
+     * dependencies, AppAuth included. But "android.support" is still required by the platform in
+     * order to open a chrome tab. As a result - a chrome tab is not found, and an external browser
+     * is opened instead.
+     * Workaround: Using StringBuilder to create the string
+     * "android.support.customtabs.action.CustomTabsService" in runtime prevents the jetifier static
+     * regex from matching "android.support" in the compiled class, thus avoiding the androidx
+     * replacement.
      */
+    @SuppressWarnings("StringBufferReplaceableByString")
     @VisibleForTesting
-    static final String ACTION_CUSTOM_TABS_CONNECTION =
-            CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION;
+    static final String ACTION_CUSTOM_TABS_CONNECTION = new StringBuilder()
+        .append("android.")
+        .append("support.customtabs.action.CustomTabsService").toString();
 
     /**
      * An arbitrary (but unregistrable, per
