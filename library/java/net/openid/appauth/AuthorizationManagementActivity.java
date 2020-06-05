@@ -244,6 +244,11 @@ public class AuthorizationManagementActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+
+        if (intent.getData() == null) {
+            Logger.debug("no data in onNewIntent(), expecting new authIntent ");
+            extractState(intent.getExtras());
+        }
     }
 
     @Override
@@ -257,7 +262,8 @@ public class AuthorizationManagementActivity extends Activity {
     }
 
     private void handleAuthorizationComplete() {
-        Uri responseUri = Uri.parse(Objects.requireNonNull(getIntent().getData()).toString().replace('#', '?'));
+        Uri originalUri = Objects.requireNonNull(getIntent().getData());
+        Uri responseUri = Uri.parse(originalUri.toString().replace('#', '?'));
         Intent responseData = extractResponseData(responseUri);
         if (responseData == null) {
             Logger.error("Failed to extract OAuth2 response from redirect");
