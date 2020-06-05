@@ -244,6 +244,11 @@ public class AuthorizationManagementActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+
+        if (intent.getData() == null) {
+            Logger.debug("no data in onNewIntent(), expecting new authIntent ");
+            extractState(intent.getExtras());
+        }
     }
 
     @Override
