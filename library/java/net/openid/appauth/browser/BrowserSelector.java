@@ -24,9 +24,10 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.browser.customtabs.CustomTabsService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,24 +50,10 @@ public final class BrowserSelector {
 
     /**
      * The service we expect to find on a web browser that indicates it supports custom tabs.
-     *
-     * Workaround for Android Jetifier bug (https://issuetracker.google.com/issues/119183822)
-     *
-     * Problem: Projects that are using androidx are using a Jetifier compiler as a dependency.
-     * The Jetifier compiler is replacing "android.support" with "androidx" inside all the
-     * dependencies, AppAuth included. But "android.support" is still required by the platform in
-     * order to open a chrome tab. As a result - a chrome tab is not found, and an external browser
-     * is opened instead.
-     * Workaround: Using StringBuilder to create the string
-     * "android.support.customtabs.action.CustomTabsService" in runtime prevents the jetifier static
-     * regex from matching "android.support" in the compiled class, thus avoiding the androidx
-     * replacement.
      */
-    @SuppressWarnings("StringBufferReplaceableByString")
     @VisibleForTesting
-    static final String ACTION_CUSTOM_TABS_CONNECTION = new StringBuilder()
-            .append("android.")
-            .append("support.customtabs.action.CustomTabsService").toString();
+    static final String ACTION_CUSTOM_TABS_CONNECTION =
+            CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION;
 
     /**
      * An arbitrary (but unregistrable, per
@@ -195,7 +182,8 @@ public final class BrowserSelector {
     private static boolean isFullBrowser(ResolveInfo resolveInfo) {
         // The filter must match ACTION_VIEW, CATEGORY_BROWSEABLE, and at least one scheme,
         if (!resolveInfo.filter.hasAction(Intent.ACTION_VIEW)
-                || !resolveInfo.filter.hasCategory(Intent.CATEGORY_BROWSABLE)
+                || !(resolveInfo.filter.hasCategory(Intent.CATEGORY_BROWSABLE)
+                    || (resolveInfo.filter.hasCategory(Intent.CATEGORY_APP_BROWSER)))
                 || resolveInfo.filter.schemesIterator() == null) {
             return false;
         }
