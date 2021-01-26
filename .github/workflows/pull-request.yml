@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Verify lint
-        run: ./gradlew check jacoco
+        run: ./gradlew check
 
   unit_tests:
     name: Unit Tests
