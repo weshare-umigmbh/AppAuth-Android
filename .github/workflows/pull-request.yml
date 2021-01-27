@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Verify lint
-        run: ./gradlew showVersion
+        run: ./gradlew --stacktrace showVersion
 
   static_analysis:
     name: Lint

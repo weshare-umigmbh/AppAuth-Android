@@ -42,7 +42,7 @@ try {
         project.ext.versionName = 'DEV'
     }
 } catch (Exception ignored) {
-    logger.error(ignored)
+    logger.error(ignored.toString())
     project.ext.versionNum = 0
     project.ext.versionName = 'DEV'
     project.ext.versionDate = new Date()
