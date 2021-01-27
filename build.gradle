@@ -48,14 +48,14 @@ project.ext {
     buildToolsVersion = '30.0.0'
 
     googleVersions = [
-            glide                 : '4.11.0',
-            material              : '1.1.0',
+        glide                 : '4.11.0',
+        material              : '1.1.0',
     ]
 
     androidXVersions = [
-            annotation            : '1.1.0',
-            appCompat             : '1.1.0',
-            browser               : '1.2.0',
+        annotation            : '1.1.0',
+        appCompat             : '1.1.0',
+        browser               : '1.2.0',
     ]
 
     okioVersion = '1.17.5'
