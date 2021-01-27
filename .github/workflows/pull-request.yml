@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Verify lint
-        run: ./gradlew check
+        run: ./gradlew library:check
 
   unit_tests:
     name: Unit Tests
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Execute coverage tests
-        run: ./gradlew jacoco
+        run: ./gradlew library:jacoco
 
   build_app:
     name: Build
@@ -29,4 +29,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Assemble
-        run: ./gradlew assemble
+        run: ./gradlew library:assemble
