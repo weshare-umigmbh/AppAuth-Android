@@ -27,16 +27,22 @@ subprojects {
 ext.verifyKeystore()
 
 try {
+    logger.lifecycle("reading version")
     def grgit = Grgit.open(dir: '.')
+    logger.lifecycle("opened folder")
     def lastCommit = grgit.head()
-
+    logger.lifecycle("got last commit "+lastCommit)
     project.ext.versionNum = grgit.log(includes:['HEAD']).size()
+    logger.lifecycle("got version num "+versionNum)
     project.ext.versionName = grgit.describe()
+    logger.lifecycle("got version name "+versionName)
     project.ext.versionDate = lastCommit.getDate()
+    logger.lifecycle("got version date "+versionDate)
     if (project.ext.versionName == null) {
         project.ext.versionName = 'DEV'
     }
 } catch (Exception ignored) {
+    logger.error(ignored)
     project.ext.versionNum = 0
     project.ext.versionName = 'DEV'
     project.ext.versionDate = new Date()
