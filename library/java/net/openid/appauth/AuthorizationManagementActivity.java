@@ -137,7 +137,7 @@ public class AuthorizationManagementActivity extends Activity {
     @VisibleForTesting
     static final String KEY_AUTHORIZATION_STARTED = "authStarted";
 
-    private boolean mAuthorizationStarted = false;
+    private Intent mAuthorizationStartedWithIntent = null;
     private Intent mAuthIntent;
     private AuthorizationRequest mAuthRequest;
     private PendingIntent mCompleteIntent;
@@ -215,9 +215,9 @@ public class AuthorizationManagementActivity extends Activity {
          * stack underneath the authorization activity.
          */
 
-        if (!mAuthorizationStarted) {
+        if (mAuthorizationStartedWithIntent != mAuthIntent) {
             startActivity(mAuthIntent);
-            mAuthorizationStarted = true;
+            mAuthorizationStartedWithIntent = mAuthIntent;
             return;
         }
 
@@ -253,7 +253,7 @@ public class AuthorizationManagementActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(KEY_AUTHORIZATION_STARTED, mAuthorizationStarted);
+        outState.putParcelable(KEY_AUTHORIZATION_STARTED, mAuthorizationStartedWithIntent);
         outState.putParcelable(KEY_AUTH_INTENT, mAuthIntent);
         outState.putString(KEY_AUTH_REQUEST, mAuthRequest.jsonSerializeString());
         outState.putParcelable(KEY_COMPLETE_INTENT, mCompleteIntent);
@@ -308,7 +308,7 @@ public class AuthorizationManagementActivity extends Activity {
         }
 
         mAuthIntent = state.getParcelable(KEY_AUTH_INTENT);
-        mAuthorizationStarted = state.getBoolean(KEY_AUTHORIZATION_STARTED, false);
+        mAuthorizationStartedWithIntent = state.getParcelable(KEY_AUTHORIZATION_STARTED);
         try {
             String authRequestJson = state.getString(KEY_AUTH_REQUEST, null);
             mAuthRequest = authRequestJson != null
