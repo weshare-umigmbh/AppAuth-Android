@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import net.openid.appauth.AuthorizationException.AuthorizationRequestErrors;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +38,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk=16)
+@Config(constants = BuildConfig.class, sdk = 16)
 public class AuthorizationManagementActivityTest {
 
     private AuthorizationRequest mAuthRequest;
@@ -298,6 +299,35 @@ public class AuthorizationManagementActivityTest {
     }
 
     @Test
+    public void onResumeDoesNotStartAuthIfIntentIsTheSame() {
+        emulateFlowToAuthorizationActivityLaunch(mStartIntentWithPendingsWithoutCancel);
+        // Try to launch new auth request with same intent
+        emulateAuthorizationResponseReceived(mStartIntentWithPendingsWithoutCancel);
+        assertThat(mActivityShadow.getNextStartedActivity()).isNull();
+    }
+
+    @Test
+    public void onResumeStartsAuthIfIntentIsDifferent() {
+        instantiateActivity(mStartIntentWithPendingsWithoutCancel);
+        mController.create().start().resume();
+
+        // an activity should be started the first time for auth
+        assertThat(mActivityShadow.getNextStartedActivity()).hasAction("AUTH");
+
+        // the management activity will be paused while the authorization flow is running.
+        // if there is no memory pressure, the activity will remain in the paused state.
+        mController.pause();
+
+        // a external component starts another auth flow in the mean time (with a different intent)
+        mController.newIntent(mStartIntentWithPendings);
+
+        mController.resume();
+
+        //  an activity should be started again for auth
+        assertThat(mActivityShadow.getNextStartedActivity()).hasAction("AUTH");
+    }
+
+    @Test
     public void testMismatchedState_withPendingIntentsAndResponseDiffersFromRequest() {
         emulateFlowToAuthorizationActivityLaunch(mStartIntentWithPendings);
 
@@ -461,7 +491,7 @@ public class AuthorizationManagementActivityTest {
         assertThat(resultIntent).hasExtra(AuthorizationException.EXTRA_EXCEPTION);
 
         assertThat(AuthorizationException.fromIntent(resultIntent))
-            .isEqualTo(AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW);
+                .isEqualTo(AuthorizationException.GeneralErrors.USER_CANCELED_AUTH_FLOW);
 
         assertThat(mActivity).isFinishing();
     }
